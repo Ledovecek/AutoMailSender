@@ -26,6 +26,13 @@ public class DatabaseManager {
 
     public SQLDatabaseConnection connect() {
         SQLDatabaseConnection connection = new SQLConnectionBuilder(ADDRESS, PORT, DATABASE, USERNAME, PASSWORD).build();
+        connection.exec(() -> "CREATE TABLE IF NOT EXISTS `saved_contacts` (" +
+                "`id` BIGINT(255) NOT NULL AUTO_INCREMENT," +
+                "`contact` TEXT NULL," +
+                "PRIMARY KEY (`id`)" +
+                ")" +
+                "COLLATE='utf8mb4_general_ci'" +
+                ";");
         if (connection.connect()) return connection;
         return null;
     }
