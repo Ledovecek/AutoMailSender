@@ -30,7 +30,7 @@ public class MailSender {
 
     public void sendMail(String subject, String content, SQLDatabaseConnection connection, List<String> recipients) {
         recipients.forEach(recipient -> {
-            Optional<Row> result = connection.select("id").from("saved_contacts").where().isEqual("mail", recipient).obtainOne();
+            Optional<Row> result = connection.select("id").from("saved_contacts").where().isEqual("contact", recipient).obtainOne();
             if (result.isEmpty()) {
                 Properties props = new Properties();
                 props.put("mail.smtp.auth", "true");
@@ -53,7 +53,7 @@ public class MailSender {
                     message.setContent(content, "text/html; charset=UTF-8");
 
                     Transport.send(message);
-                    connection.insert().into("saved_contacts", "mail").values(recipient).execute();
+                    connection.insert().into("saved_contacts", "contact").values(recipient).execute();
 
                     System.out.println("Sent - " + recipient);
 
