@@ -4,9 +4,14 @@ import me.zort.sqllib.SQLDatabaseConnection;
 import me.zort.sqllib.api.data.Row;
 import org.simpleyaml.configuration.file.YamlFile;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +55,24 @@ public class MailSender {
                     message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
                     message.setHeader("Content-Type", "text/plain; charset=UTF-8");
                     message.setSubject(subject);
-                    message.setContent(content, "text/html; charset=UTF-8");
+
+                    BodyPart messageBodyPart = new MimeBodyPart();
+                    messageBodyPart.setContent(content, "text/html; charset=UTF-8");
+
+
+                    Multipart multipart = new MimeMultipart();
+
+                    multipart.addBodyPart(messageBodyPart);
+
+                    messageBodyPart = new MimeBodyPart();
+
+                    DataSource source = new FileDataSource("file.pdf");
+                    messageBodyPart.setDataHandler(new DataHandler(source));
+                    messageBodyPart.setFileName("file.pdf");
+
+                    multipart.addBodyPart(messageBodyPart);
+
+                    message.setContent(multipart);
 
                     Transport.send(message);
                     connection.insert().into("saved_contacts", "contact").values(recipient).execute();
